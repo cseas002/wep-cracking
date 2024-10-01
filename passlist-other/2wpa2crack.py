@@ -70,7 +70,7 @@ def crack_wpa2(handshake, wordlist, ssid):
     return None
 
 if __name__ == "__main__":
-    capture_file = "logs/log-01.cap"  # Example capture file path
+    capture_file = "../logs/log-01.cap"  # Example capture file path
     wordlist_file = "passlist.txt"  # Path to the password list
     ssid = "50:B0:19:AE:21:EF"  # The SSID used in the handshake
     

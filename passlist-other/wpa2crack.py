@@ -92,6 +92,6 @@ def crack_wpa2_handshake(cap_file, ssid, wordlist):
 
 if __name__ == "__main__":
     ssid = "50:B0:19:AE:21:EF"  # Replace with your SSID
-    cap_file = "logs/log-01.cap"  # Replace with the path to your .cap file
+    cap_file = "../logs/log-01.cap"  # Replace with the path to your .cap file
     wordlist = "passlist.txt"  # Replace with the path to your wordlist file
     crack_wpa2_handshake(cap_file, ssid, wordlist)
