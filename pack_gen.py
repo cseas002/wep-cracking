@@ -134,5 +134,8 @@ def main(key=None):
     print(f"Encrypted data and packets written to {csv_filename} successfully.")
 
 
+# We observed that keys with FF inside them are cannot be discovered
+# (probably because it goes again in the beginning because of modulo)
+# Also, not all keys are cracked
 if __name__ == "__main__":
-    main("AFFFFFFF")
+    main("AAFE71A2FE")

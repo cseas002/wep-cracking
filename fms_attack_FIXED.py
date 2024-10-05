@@ -16,7 +16,6 @@ def load_packets_from_csv(file_path):
 # FMS Attack Implementation
 def fms_attack(packets):
     key_bytes = []
-    B = 0xAA  # The SNAP header
     possible_keys = []  # 2D list with 5 empty arrays
     previous_key_index = 0
     # Iterate over each packet
@@ -24,7 +23,8 @@ def fms_attack(packets):
     # For packets with format (a + 3, 255, v)
     while index < len(packets):
         # The packets with format (v, 257 - v, 255), can help in recovering only the FIRST byte of the key
-        while 256 <= index < 512:
+        # They are 254 packets
+        while 256 <= index < 510:
             packet = packets[index]
             if len(packet) < 4:
                 continue  # Skip if the packet is too short
@@ -48,6 +48,8 @@ def fms_attack(packets):
             possible_keys.append(possible_key_byte)  # Append in the possible byte for position a - 3 (so 0, 1, ...)
             index += 1
 
+        if index >= len(packets):
+            break
         packet = packets[index]
         if len(packet) < 4:
             continue  # Skip if the packet is too short
