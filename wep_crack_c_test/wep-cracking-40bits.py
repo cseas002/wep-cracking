@@ -82,4 +82,4 @@ def crack_wep(wep_file):
 
 
 if __name__ == "__main__":
-    crack_wep("logs/log1.wep")
+    crack_wep("../logs/log1.wep")

@@ -120,4 +120,4 @@ def crack_wep(file_path, wordlist_file):
 
 
 if __name__ == "__main__":
-    crack_wep("logs/log1.wep", "passlist-other/passlist.txt")
+    crack_wep("../logs/log1.wep", "passlist-other/passlist.txt")

@@ -2,11 +2,12 @@ import pandas as pd
 
 
 # RC4 Key Scheduling Algorithm (KSA)
-def ksa(key):
+def ksa(key, stop_at_3=True):
     n = 256
     S = list(range(n))
     j = 0
-
+    if stop_at_3:
+        n = 3
     for i in range(n):
         j = (j + S[i] + key[i % len(key)]) % n
         S[i], S[j] = S[j], S[i]  # Swap
@@ -16,14 +17,14 @@ def ksa(key):
 
 # Pseudo-Random Generation Algorithm (PRGA)
 def prga(S):
-    i = 0
     j = 0
-    while True:
-        i = (i + 1) % 256
+    for i in range(3):
         j = (j + S[i]) % 256
         S[i], S[j] = S[j], S[i]  # Swap
         K = S[(S[i] + S[j]) % 256]
-        yield K  # Generate the next byte of keystream
+        yield K  # Generate the next byte of key_inputstream
+    # K = S[(S[i] + S[j]) % 256]
+    # return K
 
 
 # Load weak IVs and ciphertexts from a CSV file
@@ -47,6 +48,8 @@ def organize_ivs_by_a(ivs, ciphertexts):
 
     for iv, ciphertext in zip(ivs, ciphertexts):
         a = iv[0]  # a is the first element of the IV
+        if a == 2 or a > 7:
+            continue
         if a not in organized_ivs:
             organized_ivs[a] = {'ivs': [], 'ciphertexts': []}
 
@@ -68,40 +71,34 @@ def fms_attack(organized_ivs):
     for a in sorted(organized_ivs.keys()):
         possible_keys = []
         for iv, ciphertext in zip(organized_ivs[a]['ivs'], organized_ivs[a]['ciphertexts']):
+            # print(len(organized_ivs[a]['ivs']))
             # Use the first 3 bytes of the IV
             K = iv[:3]
-            # key_byte_to_decrypt = a - 3  # We first decrypt the first byte (3 - 3), then second, etc.
 
-            # We don't add any byte in the beginning, only the IV, since we don't know any more bytes,
-            # then the first byte of ciphertext, then the first two bytes, etc.
             K += key_bytes
 
             # Initialize S using the KSA
             # S = ksa(K)
-            S = list(range(256))
+            S = [0] * 256
+            for i in range(256):
+                S[i] = i
 
             # Perform the first <len(K)> iterations of KSA to initialize the state machine
             j = 0
             for i in range(len(K)):
                 j = (j + S[i] + K[i]) % 256
                 S[i], S[j] = S[j], S[i]  # Swap
-                if i == 1:
-                    original0 = S[0]
-                    original1 = S[1]
 
             # Now generate the keystream output
-            keystream_gen = prga(S)
-            # Get the keystream byte
-            O = next(keystream_gen)  # The next byte of the keystream
+            # ciphertext[0] = 0xAA ^ O
+            O = 0xAA ^ ciphertext[0]  # The first keystream byte is this, since we know the plaintext
 
-            keyStreamByte = B ^ ciphertext[0]
-
-            possible_key_byte = (O - 0 - S[3]) % 256  # Compute K[<a>]
-
+            possible_key_byte = (O - j - S[len(K)]) % 256  # Compute the next possible key byte
             possible_keys.append(possible_key_byte)
 
         # Identify the most common byte as the next byte of the key
         if possible_keys:
+            print(possible_keys)
             most_common_key_byte = max(set(possible_keys), key=possible_keys.count)
             key_bytes.append(most_common_key_byte)
 
@@ -110,7 +107,7 @@ def fms_attack(organized_ivs):
 
 if __name__ == '__main__':
     # Example usage
-    file_path = 'packets.csv'  # Replace with your actual CSV file path
+    file_path = '../packets.csv'  # Replace with your actual CSV file path
     ivs, ciphertexts = load_ivs_from_csv(file_path)
 
     # Organize the loaded IVs and ciphertexts by the starting value of a
@@ -118,6 +115,9 @@ if __name__ == '__main__':
 
     # Perform the FMS attack
     key = fms_attack(organized_ivs)
+    hex_key = 0x0
+    for i in range(len(key)):
+        hex_key += key[-(i + 1)] * (256 ** i)
 
     # Print the derived key
-    print("Derived Key Bytes:", key)
+    print("Derived Key:", key, hex(hex_key))

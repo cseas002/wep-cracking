@@ -3,7 +3,7 @@ import struct
 import time
 import random
 import csv
-import rc4
+import rc4_OLD
 
 # Constants for WEP
 WEP_PAYLOAD_SIZE = 100  # Max payload size (adjust as needed)

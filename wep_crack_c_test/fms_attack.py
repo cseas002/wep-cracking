@@ -1,6 +1,6 @@
 import csv
 import struct
-import rc4  # Assuming you have the RC4 implementation in rc4.py
+import rc4_OLD  # Assuming you have the RC4 implementation in rc4_OLD.py
 
 # Constants
 WEP_KEY_SIZE = 5  # WEP-40 key size (5 bytes)

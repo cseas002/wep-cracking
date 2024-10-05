@@ -1,6 +1,9 @@
 import csv
 import random
 
+WEAK_IVS = True
+PACKETS_MULT_AMT = 1000
+
 
 def rc4(key, plaintext_length):
     """Simplified RC4 implementation"""
@@ -30,10 +33,14 @@ def generate_weak_ivs_and_ciphertexts(key, num_iv=256):
     weak_ivs = []
     ciphertexts = []
 
-    for key_byte in range(5):  # There are 5 bytes in the key
+    for key_byte in range(len(key)):  # There are 5 bytes in the key
         for x in range(num_iv):
-            for j in range(10000):
-                iv = (key_byte + 3, 255, x)
+            for j in range(PACKETS_MULT_AMT):
+                if WEAK_IVS:
+                    iv = (key_byte + 3, 255, x)
+                else:
+                    iv = (random.randint(0, 255), random.randint(0, 255),
+                          random.randint(0, 255))
                 weak_ivs.append(iv)
 
                 # Generate a key stream of 10 bytes
@@ -63,7 +70,7 @@ def save_to_csv(weak_ivs, ciphertexts, filename='packets.csv'):
 
 def main():
     # Set default key as hexadecimal value 0xAAAA
-    default_key_hex = '0xFFFFFFFF'
+    default_key_hex = '0xAF1423'
 
     # key_input = input(f"Enter the key in hexadecimal format (default: {default_key_hex}): ") or default_key_hex
     key_input = default_key_hex

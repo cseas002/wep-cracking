@@ -100,7 +100,7 @@ def fms_attack(organized_ivs):
 
 if __name__ == '__main__':
     # Example usage
-    file_path = 'packets.csv'  # Replace with your actual CSV file path
+    file_path = '../FMS-Attack/WEPOutputSim.csv'  # Replace with your actual CSV file path
     ivs, ciphertexts = load_ivs_from_csv(file_path)
 
     # Organize the loaded IVs and ciphertexts by the starting value of a

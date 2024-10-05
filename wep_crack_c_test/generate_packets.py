@@ -1,7 +1,7 @@
 import os
 import struct
 import time
-import rc4  # Assuming you have the RC4 implementation in rc4.py
+import rc4_OLD  # Assuming you have the RC4 implementation in rc4_OLD.py
 import random
 
 # Constants for WEP and pcap file format
@@ -39,9 +39,9 @@ def generate_fms_iv_packet(key, iv_first_byte):
 
     # Encrypt the payload using RC4
     rc4_box = [0] * 256
-    rc4.initSBox(rc4_box)  # Ensure the S-box is initialized
-    rc4.ksa(key, rc4_box)  # Initialize RC4 key schedule
-    keystream = rc4.prga(rc4_box)  # Generate the keystream
+    rc4_OLD.initSBox(rc4_box)  # Ensure the S-box is initialized
+    rc4_OLD.ksa(key, rc4_box)  # Initialize RC4 key schedule
+    keystream = rc4_OLD.prga(rc4_box)  # Generate the keystream
     encrypted_payload = bytearray()
 
     # Encrypt payload
