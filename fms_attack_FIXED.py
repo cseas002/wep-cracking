@@ -3,13 +3,22 @@ import pandas as pd
 
 def load_packets_from_pcap(file_path):
     """
-    Loads WEP packets from a .pcap file and returns them
-    :return first_form, second_form
+    Loads WEP packets from a .pcap file and returns them.
+
+    :param file_path: Path to the .pcap file.
+    :return: First form packets, second form packets.
     """
 
 
 # Load packets from a CSV file
 def load_packets_from_csv(file_path):
+    """
+    Loads packets from a CSV file and classifies them into the two forms. First form has IVs
+    (a+3, 255, x) and second form (v, 257-v, 255).
+
+    :param file_path: Path to the CSV file.
+    :return: first_form (list of packets), second_form (list of packets)
+    """
     df = pd.read_csv(file_path, header=None)  # No header in your CSV
     first_form = []
     second_form = []
@@ -29,6 +38,16 @@ def load_packets_from_csv(file_path):
 
 
 def add_possible_key(possible_keys, packet, key_bytes, index=-1):
+    """
+    Adds a possible key byte to the possible_keys list by performing the KSA algorithm
+    and deriving a byte of the keystream (index is the key byte position). If index is
+    -1, second form is used, so the byte is 0. By key, we mean the key AFTER the IV.
+
+    :param possible_keys: List of possible key bytes for the <index> byte of the key.
+    :param packet: Packet from which to derive the key byte.
+    :param key_bytes: Known key bytes that have been derived so far.
+    :param index: Key byte index being processed, -1 if using the second form to derive the first byte.
+    """
     if len(packet) < 4:
         return  # Skip if the packet is too short
 
@@ -57,6 +76,13 @@ def add_possible_key(possible_keys, packet, key_bytes, index=-1):
 
 # FMS Attack Implementation
 def fms_attack(first_form, second_form):
+    """
+    Performs the FMS attack on WEP packets to derive the key.
+
+    :param first_form: List of packets in the first form.
+    :param second_form: List of packets in the second form.
+    :return: The derived WEP key as a list of bytes.
+    """
     key_bytes = []
     possible_keys = []  # List of possible key bytes for each position
 

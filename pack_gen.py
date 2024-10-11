@@ -4,6 +4,12 @@ import csv
 
 # RC4 Key Scheduling Algorithm (KSA)
 def ksa(key):
+    """
+    Initializes the RC4 state array (S) using the provided key.
+
+    :param key: The key used for the KSA process, given as a list of integers (bytes).
+    :return: The initialized S array.
+    """
     S = [i for i in range(256)]
     j = 0
     key_length = len(key)
@@ -17,6 +23,12 @@ def ksa(key):
 
 # RC4 Pseudo-Random Generation Algorithm (PRGA)
 def prga(S):
+    """
+    Generates the RC4 keystream using the initialized S array.
+
+    :param S: The initialized S array from the KSA.
+    :yield: The next byte of the keystream.
+    """
     i = 0
     j = 0
     while True:
@@ -29,6 +41,13 @@ def prga(S):
 
 # RC4 encryption/encryption
 def rc4(key, data):
+    """
+    Encrypts or decrypts data using the RC4 algorithm with the provided key.
+
+    :param key: The RC4 key as a list of bytes.
+    :param data: The plaintext or ciphertext to encrypt/decrypt as bytes.
+    :return: The encrypted or decrypted data as bytes.
+    """
     S = ksa(key)
     keystream = prga(S)
     return bytes([byte ^ next(keystream) for byte in data])  # Returns a list if we want to have more encrypted bytes
@@ -36,6 +55,12 @@ def rc4(key, data):
 
 # Function to generate weak IVs of the form (a+3, 255, x)
 def generate_weak_ivs_first_form(key_length):
+    """
+    Generates weak IVs of the form (a+3, 255, x) for a given key length.
+
+    :param key_length: Length of the WEP key.
+    :return: List of weak IVs in the form of tuples.
+    """
     weak_ivs = []
     for a in range(key_length):
         for third_byte in range(256):
@@ -46,6 +71,11 @@ def generate_weak_ivs_first_form(key_length):
 
 # Function to generate weak IVs of the form (v, 257 - v, 255) starting from v = 2
 def generate_weak_ivs_second_form():
+    """
+    Generates weak IVs of the form (v, 257 - v, 255) starting from v = 2.
+
+    :return: List of weak IVs in the form of tuples.
+    """
     weak_ivs = []
     for v in range(2, 256):  # v starts from 2 to 255
         weak_iv = (v, 257 - v, 255)
@@ -55,6 +85,14 @@ def generate_weak_ivs_second_form():
 
 # Function to encrypt using RC4 with the given IVs and key
 def encrypt_with_weak_ivs(weak_ivs, key, snap_header):
+    """
+    Encrypts the given SNAP header (0xAA) with RC4 using the weak IVs and the provided key.
+
+    :param weak_ivs: List of weak IVs in the form of tuples.
+    :param key: The WEP key as a list of bytes.
+    :param snap_header: The SNAP header as bytes.
+    :return: A list of tuples, where each tuple contains an IV and the first byte of the encrypted SNAP header.
+    """
     encrypted_rows = []
 
     for iv in weak_ivs:
@@ -71,6 +109,12 @@ def encrypt_with_weak_ivs(weak_ivs, key, snap_header):
 
 # Function to check if a string is a valid hexadecimal value
 def is_hexadecimal(s):
+    """
+   Checks if a given string is a valid hexadecimal value.
+
+   :param s: The string to check.
+   :return: True if the string is a valid hexadecimal, False otherwise.
+   """
     try:
         int(s, 16)  # Try to convert to integer
         return True
@@ -79,6 +123,11 @@ def is_hexadecimal(s):
 
 
 def main(key=None):
+    """
+   Main function to encrypt packets using RC4 with weak IVs and write them to a CSV file.
+
+   :param key: The WEP key as a hexadecimal string. If not provided, the script will read it from the command line.
+   """
     if key is None:
         if len(sys.argv) != 2:
             print("user input key (in hex) should be second argument")
