@@ -138,4 +138,4 @@ def main(key=None):
 # (probably because it goes again in the beginning because of modulo)
 # Also, not all keys are cracked
 if __name__ == "__main__":
-    main("AAFE71A2FE")
+    main("4341434343")  # CACCC

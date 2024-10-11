@@ -1,6 +1,13 @@
 import pandas as pd
 
 
+def load_packets_from_pcap(file_path):
+    """
+    Loads WEP packets from a .pcap file and returns them
+    :return first_form, second_form
+    """
+
+
 # Load packets from a CSV file
 def load_packets_from_csv(file_path):
     df = pd.read_csv(file_path, header=None)  # No header in your CSV
