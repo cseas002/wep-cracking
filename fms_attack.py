@@ -1,13 +1,40 @@
 import pandas as pd
 
+from scapy.all import *
+from scapy.layers.dot11 import Dot11WEP
+
 
 def load_packets_from_pcap(file_path):
     """
-    Loads WEP packets from a .pcap file and returns them.
+    Loads WEP packets from a .pcap file and classifies them into the two forms. First form has IVs
+    (a+3, 255, x) and second form (v, 257-v, 255).
 
     :param file_path: Path to the .pcap file.
     :return: First form packets, second form packets.
     """
+    first_form = set()  # Use a set to avoid duplicates
+    second_form = set()
+
+    for pkt in file_path:
+        if pkt.haslayer(Dot11WEP):
+            iv = pkt.iv
+            wep_data = pkt.wepdata
+
+            if 0x3 <= iv[0] <= 0x8 and iv[1] == 0xff:
+                packet = (iv[0], iv[1], iv[2], wep_data[0])  # Convert list to tuple
+                first_form.add(packet)  # Add the tuple to the set
+            elif 0x2 <= iv[0] and iv[1] == 257 - iv[0] and iv[2] == 255:
+                packet = (iv[0], iv[1], iv[2], wep_data[0])  # Convert list to tuple
+                second_form.add(packet)  # Add the tuple to the set
+
+    # Convert each tuple to a list before returning
+    first_form_list = [list(packet) for packet in first_form]
+    second_form_list = [list(packet) for packet in second_form]
+
+    print(f"Found {len(first_form_list)} first form packets and {len(second_form_list)} second form packets")
+    # print(first_form_list, second_form_list)
+
+    return first_form_list, second_form_list  # Return lists of lists
 
 
 # Load packets from a CSV file
@@ -108,7 +135,10 @@ def fms_attack(first_form, second_form):
 if __name__ == '__main__':
     # Example usage
     file_path = 'packets.csv'  # Replace with your actual CSV file path
-    first_form, second_form = load_packets_from_csv(file_path)
+    wep_file_path = rdpcap("file8.pcap")
+    # first_form, second_form = load_packets_from_csv(file_path)
+
+    first_form, second_form = load_packets_from_pcap(wep_file_path)
 
     # Perform the FMS attack
     derived_key = fms_attack(first_form, second_form)
