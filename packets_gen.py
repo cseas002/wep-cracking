@@ -1,5 +1,6 @@
 import sys
 import csv
+import argparse
 
 
 # RC4 Key Scheduling Algorithm (KSA)
@@ -122,12 +123,13 @@ def is_hexadecimal(s):
         return False
 
 
-def main(key=None):
+def main(key=None, output_filename="packets.csv"):
     """
-   Main function to encrypt packets using RC4 with weak IVs and write them to a CSV file.
+    Main function to encrypt packets using RC4 with weak IVs and write them to a CSV file.
 
-   :param key: The WEP key as a hexadecimal string. If not provided, the script will read it from the command line.
-   """
+    :param key: The WEP key as a hexadecimal string. If not provided, the script will read it from the command line.
+    :param output_filename: The filename to save the encrypted packets. Defaults to 'packets.csv'.
+    """
     if key is None:
         if len(sys.argv) != 2:
             print("user input key (in hex) should be second argument")
@@ -159,9 +161,7 @@ def main(key=None):
     encrypted_rows_first_form = encrypt_with_weak_ivs(weak_ivs_first_form, key, snap_header)
     encrypted_rows_second_form = encrypt_with_weak_ivs(weak_ivs_second_form, key, snap_header)
 
-    # Write the results to a CSV file
-    csv_filename = "packets.csv"
-    with open(csv_filename, mode='w', newline='') as file:
+    with open(output_filename, mode='w', newline='') as file:
         writer = csv.writer(file)
 
         # First, write rows from encrypted_rows_first_form where the first column is 3 (for first byte of key)
@@ -180,11 +180,20 @@ def main(key=None):
             if row[0] != 3:
                 writer.writerow(row)
 
-    print(f"Encrypted data and packets written to {csv_filename} successfully.")
+    print(f"Encrypted data and packets written to {output_filename} successfully.")
 
 
 # We observed that keys with FF inside them are cannot be discovered
 # (probably because it goes again in the beginning because of modulo)
 # Also, not all keys are cracked
 if __name__ == "__main__":
-    main("4341434343")  # CACCC
+    # Use argparse for more flexible argument parsing
+    parser = argparse.ArgumentParser(description="Generate WEP packets with weak IVs.")
+    parser.add_argument('key', nargs='?', default="4341434343", help="WEP key in hex format (default: 4341434343)")
+    parser.add_argument('--output_filename', type=str, default="packets.csv", help="Output CSV file name (default: packets.csv)")
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Run main with the parsed key and output filename
+    main(key=args.key, output_filename=args.output_filename)

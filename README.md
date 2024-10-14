@@ -26,7 +26,20 @@ python3 packets_gen.py AAAAAAAAAA
 ```
 
 
-This produces WEP packets with the key ```0xAAAAAAAAAA```. The key must have a maximum length of 5 bytes. If an argument is not specified, the default key will be ```0x4341434343```.
+This produces WEP packets with the key ```0xAAAAAAAAAA```. The key must have a maximum length of 5 bytes. 
+Without specifying an argument, the script will default to using the WEP key ```0x4341434343``` and save the output to packets.csv.
+
+You can also specify a custom output filename using the ```--output_filename=<filename>``` argument:
+```bash
+python3 packets_gen.py <key in hex format> --output_filename=<your_custom_filename.csv>
+```
+
+For example:
+```bash
+python3 packets_gen.py AAAAAAAAAA --output_filename=wep_packets.csv
+```
+This command uses the WEP key 0xAAAAAAAAAA and saves the packets to wep_packets.csv. If --output_filename is not provided, the default packets.csv is used.
+
 
 #### **To crack the WEP password, run:**
 ```bash 
