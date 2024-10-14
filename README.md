@@ -38,7 +38,7 @@ For example:
 ```bash
 python3 packets_gen.py AAAAAAAAAA --output_filename=wep_packets.csv
 ```
-This command uses the WEP key 0xAAAAAAAAAA and saves the packets to wep_packets.csv. If --output_filename is not provided, the default packets.csv is used.
+This command uses the WEP key ```0xAAAAAAAAAA``` and saves the packets to wep_packets.csv. If --output_filename is not provided, the default packets.csv is used.
 
 
 #### **To crack the WEP password, run:**
