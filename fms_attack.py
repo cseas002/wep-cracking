@@ -1,5 +1,5 @@
 import pandas as pd
-
+import argparse
 from scapy.all import *
 from scapy.layers.dot11 import Dot11WEP
 
@@ -132,13 +132,29 @@ def fms_attack(first_form, second_form):
     return key_bytes
 
 
-if __name__ == '__main__':
-    # Example usage
-    file_path = 'packets.csv'  # Replace with your actual CSV file path
-    wep_file_path = rdpcap("file8.pcap")
-    # first_form, second_form = load_packets_from_csv(file_path)
+def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="WEP40 Cracking with FMS Attack")
 
-    first_form, second_form = load_packets_from_pcap(wep_file_path)
+    # Optional argument for reading from .pcap or .csv
+    parser.add_argument('--from_wep', action='store_true', help='Read from WEP .pcap file')
+
+    # Optional argument for file path
+    parser.add_argument('--file_path', type=str, default=None, help='File path for the input file')
+
+    args = parser.parse_args()
+
+    # Determine the file path
+    file_path = args.file_path if args.file_path else ('file8.pcap' if args.from_wep else 'packets.csv')
+
+    # Load packets based on the 'from_wep' flag
+    if args.from_wep:
+        # Read from a .pcap file
+        wep_file_path = rdpcap(file_path)
+        first_form, second_form = load_packets_from_pcap(wep_file_path)
+    else:
+        # Read from a .csv file
+        first_form, second_form = load_packets_from_csv(file_path)
 
     # Perform the FMS attack
     derived_key = fms_attack(first_form, second_form)
@@ -150,3 +166,7 @@ if __name__ == '__main__':
 
     # Print the derived key
     print("Derived Key:", derived_key, hex(hex_key))
+
+
+if __name__ == '__main__':
+    main()
