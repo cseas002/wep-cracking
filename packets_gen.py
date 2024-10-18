@@ -164,16 +164,16 @@ def main(key=None, output_filename="packets.csv"):
     with open(output_filename, mode='w', newline='') as file:
         writer = csv.writer(file)
 
-        # First, write rows from encrypted_rows_first_form where the first column is 3 (for first byte of key)
+        # Write all rows from encrypted_rows_second_form (for first byte of key)
+        for row in encrypted_rows_second_form:
+            writer.writerow(row)  # Write the second form after the first form with a = 3
+
+        # Then, write rows from encrypted_rows_first_form where the first column is 3 (for first byte of key)
         for row in encrypted_rows_first_form:
             if row[0] == 3:  # If they have IV with a = 3
                 writer.writerow(row)
             if row[0] != 3:
                 break  # Save time to just pass through the first 256 values with a = 3
-
-        # Then write all rows from encrypted_rows_second_form (for first byte of key)
-        for row in encrypted_rows_second_form:
-            writer.writerow(row)  # Write the second form after the first form with a = 3
 
         # Finally, write the remaining rows from encrypted_rows_first_form
         for row in encrypted_rows_first_form:
